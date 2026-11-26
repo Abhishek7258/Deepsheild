@@ -1,54 +1,62 @@
-# 🛡️ DeepShield
+# DeepShield
 
-<p align="center"><img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f172a,100:2563eb&height=180&section=header&text=DeepShield&fontSize=48&fontColor=ffffff&animation=fadeIn&fontAlignY=35" alt="DeepShield banner"/></p>
+An image **"cloaking" toolkit** with desktop (Tkinter) tools. It perturbs a picture with a small convolutional generator network, embeds an invisible DCT-domain watermark, and lets you detect and compare cloaked images. The idea is to make profile photos harder for AI systems to use, while looking almost unchanged to people.
 
-<p align="center"><b>Deep-learning based experimentation for detecting and evaluating adversarial perturbations.</b></p>
+> **Status:** experimental / learning project. The generator in `utilites1.py` is built with Keras and no trained weights are included, so no protection guarantees are made.
 
-<p align="center"><img src="https://img.shields.io/badge/Python-3.x-3776AB?logo=python&logoColor=white"/> <img src="https://img.shields.io/badge/Deep%20Learning-Research-8B5CF6"/> <img src="https://img.shields.io/badge/Notebook-Jupyter-F37626?logo=jupyter&logoColor=white"/></p>
+## What's in the repo
 
-## ✨ Overview
-DeepShield is a research-oriented Python project containing detection, perturbation-generation and comparison utilities for deep-learning experiments. The repository combines a main Jupyter notebook with reusable Python modules for detector experiments and GAN-based perturbations.
-
-## 🧩 Repository Structure
-| File | Purpose |
+| File | What it does |
 |---|---|
-| `Deepshield_main1.ipynb` | Main experimental notebook and workflow |
-| `Detector3.py` | Detection-related implementation |
-| `GAN_pertubations2.py` | GAN-based perturbation experiments |
-| `comparision4.py` | Comparison/evaluation utilities |
-| `utilites1.py` | Supporting helper functions |
+| `Deepshield_main1.ipynb` | Notebook with all pieces in one place: cloaking utilities, cloak app, detection app, comparison toolkit, and a ResNet50 test |
+| `utilites1.py` | Core utilities: generator (`build_generator`), DCT watermark embed/detect, `cloak_image`, `is_cloaked`, `compare_images`, and `run_ai_disruption_test` (compares ResNet50 ImageNet predictions on original vs cloaked image) |
+| `GAN_pertubations2.py` | Tkinter app "Cloak Image": pick an image, add a text watermark (text, size, colour, position), save the result |
+| `Detector3.py` | Tkinter app "Detect Cloaking": check whether a selected image looks cloaked |
+| `comparision4.py` | Tkinter "AI Cloaking Toolkit" with two tabs: detection and original-vs-cloaked comparison (saves images to `comparison_images/`) |
 
-## 🔬 Conceptual Workflow
+## How it works
+
 ```mermaid
 graph LR
-A[Input / Dataset] --> B[Model or Detector]
-B --> C[Perturbation Experiment]
-C --> D[Evaluation]
-D --> E[Comparison & Analysis]
+A[Input image] --> B[Generator network perturbation]
+B --> C[DCT watermark embedding]
+C --> D[Cloaked PNG]
+D --> E[Detection: watermark correlation / image statistics]
+A --> F[Side-by-side comparison]
+D --> F
+D --> G[ResNet50 prediction check]
 ```
 
-## 🚀 Getting Started
+## Requirements
+
+Python 3.9+ with Tkinter (bundled with most Python installers; on Debian/Ubuntu: `sudo apt install python3-tk`).
+
 ```bash
 git clone https://github.com/Abhishek7258/Deepsheild.git
 cd Deepsheild
 python -m venv .venv
-# Windows: .venv\\Scripts\\activate
-# macOS/Linux: source .venv/bin/activate
-pip install -U pip
+# Windows: .venv\Scripts\activate    macOS/Linux: source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
-Open `Deepshield_main1.ipynb` with Jupyter Notebook/Lab and run the cells in order. Install the Python packages imported by the notebook/modules if your environment does not already contain them.
+## Usage
 
-## 📊 Experiments
-The repository is structured around three useful research activities: detection, perturbation generation, and comparison of experimental outputs. Keep datasets, model weights and generated artifacts outside Git when they are large.
+```bash
+python GAN_pertubations2.py   # cloak / watermark an image
+python Detector3.py           # detect whether an image is cloaked
+python comparision4.py        # detection + comparison toolkit
+```
 
-## ⚠️ Research Note
-Results depend on the dataset, model, preprocessing and runtime environment used for each experiment. This repository should be treated as an experimental/research codebase rather than a production security system.
+Or open `Deepshield_main1.ipynb` in Jupyter and run the cells in order. The first ResNet50 test downloads the ImageNet weights, so it needs internet access.
 
-## 🤝 Contributing
-Improvements to reproducibility, documentation, experiment configuration and evaluation are welcome. Please describe the experiment and environment when submitting changes.
+## Notes
 
-## 📄 License
-No license file is currently declared in the repository. Add a license before distributing or reusing the project publicly.
+- Watermark key and strength are constants near the top of `utilites1.py` (`WATERMARK_SECRET_KEY`, `WATERMARK_STRENGTH`). Replace the key with your own before real use.
+- The code files are named with numeric suffixes (`Detector3.py`, etc.) from development; the apps are standalone scripts, not an installable package.
+- `GAN_pertubations2.py` uses `arial.ttf` for the text watermark; change the font on systems without it.
 
-<p align="center">Built for experimentation, evaluation and learning in deep learning.</p>
+## Roadmap ideas
+
+- Train or load real generator weights and document the results
+- Share one code path between the notebook and the scripts
+- Add sample before/after images
